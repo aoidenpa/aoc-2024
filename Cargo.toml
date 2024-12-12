@@ -1,0 +1,25 @@
+[package]
+name = "aoc_template"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+aoc-client = "0.2.0"
+chrono = "0.4.38"
+clap = "4.4.10"
+clap_derive = "4.4.2"
+dotenv = "0.15.0"
+itertools = "0.13.0"
+regex = "1.11.1"
+
+[dev-dependencies]
+criterion = { version = "0.4", features = ["html_reports"] }
+
+[[bench]]
+name = "benches"
+harness = false
+
+[profile.release]
+debug = true
