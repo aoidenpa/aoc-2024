@@ -2,6 +2,7 @@
 
 pub mod day_executer;
 pub mod parser;
+pub mod util;
 
 pub mod day1;
 pub mod day2;
