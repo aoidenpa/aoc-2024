@@ -30,3 +30,7 @@ where
     }
     res
 }
+
+pub fn in_bounds(cur: (i32, i32), size: (usize, usize)) -> bool {
+    cur.0 >= 0 && cur.0 < size.0 as i32 && cur.1 >= 0 && cur.1 < size.1 as i32
+}
