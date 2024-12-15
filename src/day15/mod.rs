@@ -25,8 +25,6 @@ pub fn part1(input: String) -> String {
 	grid.push(line.chars().collect::<Vec<char>>());
     }
     let codes = codes.replace("\n", "");
-    // println!("map: {:?}", grid);
-    // println!("codes: {}", codes);
     let dirmap = HashMap::from([('v', (0, 1)), ('>', (1, 0)), ('<', (-1, 0)), ('^', (0, -1))]);
     let w = grid[0].len();
     let h = grid.len();
@@ -47,7 +45,6 @@ pub fn part1(input: String) -> String {
 	let mut n = pos;
 	loop {
 	    n = (n.0 + dir.0, n.1 + dir.1);
-	    println!("{:?}", code);
 	    if !in_bounds(n, (w, h)) || grid[n.1 as usize][n.0 as usize] == '#' {
 		break;
 	    }
@@ -67,18 +64,6 @@ pub fn part1(input: String) -> String {
 	    }
 	    pos = (pos.0 + dir.0, pos.1 + dir.1);
 	}
-	// println!("After {}: pos: {:?} \n", code, pos);
-	// for i in 0..h {
-	//     for j in 0..w {
-	// 	if (j as i32, i as i32) == pos {
-	// 	    print!("@");
-	// 	}
-	// 	else {
-	// 	    print!("{}", grid[i][j]);
-	// 	}
-	//     }
-	//     println!();
-	// }
     }
     for i in 0..h {
 	for j in 0..w {
@@ -115,12 +100,9 @@ pub fn part2(input: String) -> String {
 		v.push('.');
 	    }
 	}
-	//grid.push(line.chars().collect::<Vec<char>>());
 	grid.push(v);
     }
     let codes = codes.replace("\n", "");
-    // println!("map: {:?}", grid);
-    // println!("codes: {}", codes);
     let dirmap = HashMap::from([('v', (0, 1)), ('>', (1, 0)), ('<', (-1, 0)), ('^', (0, -1))]);
     let w = grid[0].len();
     let h = grid.len();
@@ -134,127 +116,68 @@ pub fn part2(input: String) -> String {
 	    }
 	}
     }
-    println!("INIT: ");
-    for i in 0..h {
-	for j in 0..w {
-	    if (j as i32, i as i32) == pos {
-		print!("@");
-	    }
-	    else {
-		print!("{}", grid[i][j]);
-	    }
-	}
-	println!();
-    }
-    for (e, code) in codes.chars().enumerate() {
-	let &dir = dirmap.get(&code).unwrap();
-	let mut boxes = vec![];
-	let mut ok = false;
-	let mut n = pos;
-	let mut two: Option<(Vec<(i32, i32)>, i32)> = None;
-	let mut print = false;
-	loop {
-	    if let Some((pushes, y)) = two {
-		let mut check = true;
-		let mut newtwo = vec![];
-		for push in pushes {
-		    let n1 = (push.0, y);
-		    let n2 = (push.1, y);
-		    if !in_bounds(n1, (w, h)) || !in_bounds(n2, (w, h)) {
-			check = false;
-			break;
-		    }
-		    let n1u = (n1.0 as usize, n1.1 as usize);
-		    let n2u = (n2.0 as usize, n2.1 as usize);
-		    if grid[n1u.1][n1u.0] == '#' || grid[n2u.1][n2u.0] == '#' {
-			check = false;
-			break;
-		    }
-		    if grid[n1u.1][n1u.0] == '.' && grid[n2u.1][n2u.0] == '.' {
-			continue;
-		    }
-		    if grid[n1u.1][n1u.0] == ']' {
-			boxes.push(n1);
-			boxes.push((n1.0-1, n1.1));
-			newtwo.push((n1.0-1, n1.0));
-			//two = Some((n1.0-1, n1.0, n1.1 + dir.1));
-			
-		    }
-		    if grid[n1u.1][n1u.0] == '[' {
-			boxes.push(n1);
-			boxes.push((n1.0+1, n1.1));
-			newtwo.push((n1.0, n1.0+1));
-			//two = Some((n1.0, n1.0+1, n1.1 + dir.1));
-		    }
-		    if grid[n2u.1][n2u.0] == '[' {
-			boxes.push(n2);
-			boxes.push((n2.0+1, n1.1));
-			newtwo.push((n2.0, n2.0+1));
-			//two = Some((n2.0, n2.0+1, n2.1 + dir.1));
-		    }
-		}
-		// println!("old newtwo {:?}", newtwo);
-		// let newtwo: Vec<(i32, i32)> = newtwo.into_iter().unique().collect();
-		// let box: Vec<(i32, i32)> = newtwo.into_iter().unique().collect();
-		// println!("new newtwo {:?}", newtwo);
-		if !check {
-		    ok = false;
-		    break;
-		}
-		if newtwo.is_empty() {
-		    ok = true;
-		    break;
+    let mut print = false;
+    if print {
+	for i in 0..h {
+	    for j in 0..w {
+		if (j as i32, i as i32) == pos {
+		    print!("@");
 		}
 		else {
-		    two = Some((newtwo, y + dir.1));
+		    print!("{}", grid[i][j]);
 		}
 	    }
-	    else {
-		n = (n.0 + dir.0, n.1 + dir.1);
-		if !in_bounds(n, (w, h)) || grid[n.1 as usize][n.0 as usize] == '#' {
-		    break;
-		}
-		if grid[n.1 as usize][n.0 as usize] == '.' {
-		    ok = true;
-		    break;
-		}
-		else if grid[n.1 as usize][n.0 as usize] == '['{
-		    if dir.0 == 0 {
-			boxes.push(n);
-			boxes.push((n.0+1, n.1));
-			two = Some((vec![(n.0, n.0+1)], n.1+dir.1));
-		    }
-		    else {
-			boxes.push(n);
-		    }
-		}
-		else if grid[n.1 as usize][n.0 as usize] == ']'{
-		    if dir.0 == 0 {
-			boxes.push(n);
-			boxes.push((n.0-1, n.1));
-			two = Some((vec![(n.0-1, n.0)], n.1+dir.1));
-			//two = Some((n.0-1, n.0, n.1+dir.1));
-		    }
-		    else {
-			boxes.push(n);
-		    }
-		}
-	    }
+	    println!();
 	}
+    }
+    // do a BFS on every box we touch. if any of them gets blocked, abort. if all ok, move all.
+    for code in codes.chars() {
+	let &dir = dirmap.get(&code).unwrap();
+	let mut boxes = vec![];
+	let mut ok = true;
+	let mut pushes: Vec<(i32, i32)> = vec![pos];
+	while !pushes.is_empty() {
+	    let cur = pushes.remove(0);
+	    if grid[cur.1 as usize][cur.0 as usize] == '[' || grid[cur.1 as usize][cur.0 as usize] == ']' {
+		boxes.push(cur);
+	    }
+	    let n = (cur.0 + dir.0, cur.1 + dir.1);
+	    if !in_bounds(n, (w, h)) || grid[n.1 as usize][n.0 as usize] == '#' {
+		ok = false;
+		break;
+	    }
+	    if grid[n.1 as usize][n.0 as usize] == '[' {
+		if dir.0 == 0 {
+		    pushes.push((n.0, n.1));
+		    pushes.push((n.0+1, n.1));
+		}
+		else {
+		    pushes.push(n);
+		}
+	    }
+	    else if grid[n.1 as usize][n.0 as usize] == ']' {
+		if dir.0 == 0 {
+		    pushes.push((n.0, n.1));
+		    pushes.push((n.0-1, n.1));
+		}
+		else {
+		    pushes.push(n);
+		}
+	    }
+	    pushes = pushes.into_iter().unique().collect();
+	}
+	//if moving, move all encountered boxes and robot in dir
 	if ok {
 	    let boxes: Vec<(i32, i32)> = boxes.into_iter().unique().collect();
-	    println!("OK!! move code: {} e: {}", code, e);
+	    //since we did BFS, the farthest boxes are at the end. move them first.
 	    for i in (0..boxes.len()).rev() {
 		let b = boxes[i];
-		println!("PUSHING: {:?}, dir: {:?}", b, dir);
 		grid[(b.1 + dir.1) as usize][(b.0 + dir.0) as usize] = grid[b.1 as usize][b.0 as usize];
 		grid[b.1 as usize][b.0 as usize] = '.';
 	    }
 	    pos = (pos.0 + dir.0, pos.1 + dir.1);
 	}
-	//if e > 19637 && e < 19642 {
-	if false {
-	    //println!("ins: {}, After {}: pos: {:?} \n", e, code, pos);
+	if print {
 	    for i in 0..h {
 		for j in 0..w {
 		    if (j as i32, i as i32) == pos {
