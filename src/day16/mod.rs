@@ -23,7 +23,6 @@ pub fn part1(input: String) -> String {
     }
     let w = grid[0].len();
     let h = grid.len();
-
     let mut start = (0, 0);
     let mut end = (0, 0);
     for i in 0..w {
