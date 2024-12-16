@@ -28,6 +28,7 @@ pub fn part1(input: String) -> String {
     let dirmap = HashMap::from([('v', (0, 1)), ('>', (1, 0)), ('<', (-1, 0)), ('^', (0, -1))]);
     let w = grid[0].len();
     let h = grid.len();
+    println!("{:?}", (w, h));
     let mut pos = (0, 0);
     'out: for i in 0..w {
 	for j in 0..h {
