@@ -103,51 +103,82 @@ pub fn part2(input: String) -> String {
 	}
     }
     let dirs = [(0, 1), (-1, 0), (0, -1), (1, 0)];
-    let mut q = VecDeque::new();
-    let mut set = HashSet::new();
-    set.insert(start);
-    q.push_back((start, 0, (1, 0), set));
-    let mut map = HashMap::new();
-    let mut scores = vec![];
+    let mut maps = vec![];
     let mut best = i32::MAX;
-    //BFS with pathset
-    while !q.is_empty() {
-	let (cur, score, d, mut set) = q.pop_front().unwrap();
-	if let Some(res) = map.get(&(cur, d)) {
-	    if score <= *res {
-		map.insert((cur, d), score);
-	    }
-	    else {
-		continue;
-	    }
+    for k in 0..2 {
+	let mut q = VecDeque::new();
+	let mut set = HashSet::new();
+	set.insert(start);
+	if k == 1 {
+	    let t = end;
+	    end = start;
+	    start = t;
+	    set.insert(start);
+	    q.push_back((start, 0, (1, 0)));
+	    q.push_back((start, 0, (-1, 0)));
+	    q.push_back((start, 0, (0, 1)));
+	    q.push_back((start, 0, (0, -1)));
 	}
 	else {
-	    map.insert((cur, d), score);
+	    set.insert(start);
+	    q.push_back((start, 0, (1, 0)));
 	}
-	if cur == end {
-	    best = best.min(score);
-	    scores.push((score, set));
-	    continue;
+	let mut map = HashMap::new();
+	//BFS with pathset
+	while !q.is_empty() {
+	    let (cur, score, d) = q.pop_front().unwrap();
+	    if let Some(res) = map.get(&(cur, d)) {
+		if score <= *res {
+		    map.insert((cur, d), score);
+		}
+		else {
+		    continue;
+		}
+	    }
+	    else {
+		map.insert((cur, d), score);
+	    }
+	    if cur == end {
+		if k == 0 {
+		    best = best.min(score);
+		}
+		continue;
+	    }
+	    let n = (cur.0 as i32 + d.0 as i32, cur.1 as i32 + d.1 as i32);
+	    if grid[n.1  as usize][n.0 as usize] == '.' {
+		q.push_back(((n.0 as usize, n.1 as usize), score+1, d));
+	    }
+	    let d2 = (-d.1, d.0);
+	    let d3 = (d.1, -d.0);
+	    q.push_back((cur, score+1000, d2));
+	    q.push_back((cur, score+1000, d3));
 	}
-	if score > best {
-	    continue;
-	}
-	let n = (cur.0 as i32 + d.0 as i32, cur.1 as i32 + d.1 as i32);
-	if grid[n.1  as usize][n.0 as usize] == '.' {
-	    set.insert((n.0 as usize, n.1 as usize));
-	    q.push_back(((n.0 as usize, n.1 as usize), score+1, d, set.clone()));
-	}
-	let d2 = (-d.1, d.0);
-	let d3 = (d.1, -d.0);
-	set.remove(&(n.0 as usize, n.1 as usize));
-	q.push_back((cur, score+1000, d2, set.clone()));
-	q.push_back((cur, score+1000, d3, set));
+	maps.push(map);
     }
-    scores.sort_by(|(a1, b1), (a2, b2)| a1.cmp(a2));
-    res = scores.into_iter().
-	filter(|(score, set)| *score == best).
-	fold(HashSet::new(), |acc, x|
-	     acc.union(&x.1).map(|a| *a).collect::<HashSet<(usize, usize)>>())
-	.len();
+    let mut s = HashSet::new();
+    for i in 0..w {
+	for j in 0..h {
+	    for d in dirs {
+		if let Some(r1) = maps[0].get(&((i, j), d)) {
+		    if let Some(r2) = maps[1].get(&((i, j), (-d.0, -d.1))) {
+			if *r1 + *r2 == best {
+			    s.insert((i, j));
+			}
+		    }
+		}
+	    }
+	}
+    }
+    println!("aa {:?}", maps[0].get(&((1, 11), (0, -1))));
+    println!("bb {:?}", maps[1].get(&((1, 11), (0, 1))));
+    res = s.len();
+    
+    
+    // scores.sort_by(|(a1, b1), (a2, b2)| a1.cmp(a2));
+    // res = scores.into_iter().
+    // 	filter(|(score, set)| *score == best).
+    // 	fold(HashSet::new(), |acc, x|
+    // 	     acc.union(&x.1).map(|a| *a).collect::<HashSet<(usize, usize)>>())
+    // 	.len();
     res.to_string()
 }
