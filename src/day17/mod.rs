@@ -84,9 +84,11 @@ pub fn part2(input: String) -> String {
 	for ra in set {
 	    for i in 0..8 {
 		let new_ra = ra * 8 + i;
+		//this works for my input only. todo:  make more general
 		//using i as the last three bits, this is the number program outputs. if it is the one we want, add new possible value for register A to the set.
 		let out = (new_ra >> (i ^ 3) ^ i) % 8;
 		if out == target {
+		    //to output last 0(first index here, since we reversed code), we can't have i as 0 because leading 0's don't mean anything.
 		    if !(ind == 0 && target == 0 && i == 0) {
 			newset.insert(new_ra);
 		    }
