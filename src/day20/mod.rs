@@ -85,8 +85,9 @@ fn solve(input: String, part: i32) -> String {
     }
     let no_cheat = dist_end[start.1][start.0];
     let mut cheats = HashSet::new();
-    let cheat_dist = if part == 1 {2} else {20};
+    let cheat_dist = if part == 1 {2} else {100};
     for i in 0..w {
+	println!("{}, {}", i, w);
 	for j in 0..h {
 	    if grid[j][i] == '.' {
 		let lmin = (i as i32 - cheat_dist).max(0) as usize;
@@ -101,7 +102,7 @@ fn solve(input: String, part: i32) -> String {
 				continue;
 			    }
 			    let m = no_cheat - (dist_start[j][i] + dist_end[jj][ii] + dd);
-			    if m >= 100 {
+			    if m >= 20 {
 				if !cheats.contains(&((i, j), (ii, jj)))
 				{
 				    cheats.insert(((i, j), (ii, jj)));
